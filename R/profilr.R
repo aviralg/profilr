@@ -10,11 +10,11 @@ profilr.pop <- function() {
   time
 }
 
-profilr.matcher <- function(annotation) {
+matcher <- function(annotation) {
   annotation == as.symbol("profile")
 }
 
-profilr.transformer <- function(object, name, env, match) {
+action <- function(object, name, env, match) {
   body(object) <-
     substitute({
       profilr.push(Sys.time())
@@ -27,8 +27,11 @@ profilr.transformer <- function(object, name, env, match) {
 }
 
 profilr.register <- function() {
-  profilr.handler <- annotations.create.handler("profile", profilr.transformer)
-  annotations.register("function", "header", profilr.matcher, profilr.handler)
+  handler <- annotations.create.handler(name = "profile",
+                                        action = action,
+                                        mode = "once",
+                                        remove = TRUE)
+  annotations.register("function", "header", matcher, handler)
 }
 
 profilr.deregister <- function() {
